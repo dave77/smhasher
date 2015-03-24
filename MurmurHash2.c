@@ -119,13 +119,13 @@ uint64_t MurmurHash64A ( const void * key, int len, uint64_t seed )
 
   switch(len & 7)
   {
-  case 7: h ^= uint64_t(data2[6]) << 48;
-  case 6: h ^= uint64_t(data2[5]) << 40;
-  case 5: h ^= uint64_t(data2[4]) << 32;
-  case 4: h ^= uint64_t(data2[3]) << 24;
-  case 3: h ^= uint64_t(data2[2]) << 16;
-  case 2: h ^= uint64_t(data2[1]) << 8;
-  case 1: h ^= uint64_t(data2[0]);
+  case 7: h ^= (uint64_t)data2[6] << 48;
+  case 6: h ^= (uint64_t)data2[5] << 40;
+  case 5: h ^= (uint64_t)data2[4] << 32;
+  case 4: h ^= (uint64_t)data2[3] << 24;
+  case 3: h ^= (uint64_t)data2[2] << 16;
+  case 2: h ^= (uint64_t)data2[1] << 8;
+  case 1: h ^= (uint64_t)data2[0];
           h *= m;
   };
  
@@ -144,8 +144,8 @@ uint64_t MurmurHash64B ( const void * key, int len, uint64_t seed )
   const uint32_t m = 0x5bd1e995;
   const int r = 24;
 
-  uint32_t h1 = uint32_t(seed) ^ len;
-  uint32_t h2 = uint32_t(seed >> 32);
+  uint32_t h1 = (uint32_t)(seed ^ len);
+  uint32_t h2 = (uint32_t)(seed >> 32);
 
   const uint32_t * data = (const uint32_t *)key;
 
@@ -241,94 +241,6 @@ uint32_t MurmurHash2A ( const void * key, int len, uint32_t seed )
 
   return h;
 }
-
-//-----------------------------------------------------------------------------
-// CMurmurHash2A, by Austin Appleby
-
-// This is a sample implementation of MurmurHash2A designed to work 
-// incrementally.
-
-// Usage - 
-
-// CMurmurHash2A hasher
-// hasher.Begin(seed);
-// hasher.Add(data1,size1);
-// hasher.Add(data2,size2);
-// ...
-// hasher.Add(dataN,sizeN);
-// uint32_t hash = hasher.End()
-
-class CMurmurHash2A
-{
-public:
-
-  void Begin ( uint32_t seed = 0 )
-  {
-    m_hash  = seed;
-    m_tail  = 0;
-    m_count = 0;
-    m_size  = 0;
-  }
-
-  void Add ( const unsigned char * data, int len )
-  {
-    m_size += len;
-
-    MixTail(data,len);
-
-    while(len >= 4)
-    {
-      uint32_t k = *(uint32_t*)data;
-
-      mmix(m_hash,k);
-
-      data += 4;
-      len -= 4;
-    }
-
-    MixTail(data,len);
-  }
-
-  uint32_t End ( void )
-  {
-    mmix(m_hash,m_tail);
-    mmix(m_hash,m_size);
-
-    m_hash ^= m_hash >> 13;
-    m_hash *= m;
-    m_hash ^= m_hash >> 15;
-
-    return m_hash;
-  }
-
-private:
-
-  static const uint32_t m = 0x5bd1e995;
-  static const int r = 24;
-
-  void MixTail ( const unsigned char * & data, int & len )
-  {
-    while( len && ((len<4) || m_count) )
-    {
-      m_tail |= (*data++) << (m_count * 8);
-
-      m_count++;
-      len--;
-
-      if(m_count == 4)
-      {
-        mmix(m_hash,m_tail);
-        m_tail = 0;
-        m_count = 0;
-      }
-    }
-  }
-
-  uint32_t m_hash;
-  uint32_t m_tail;
-  uint32_t m_count;
-  uint32_t m_size;
-};
 
 //-----------------------------------------------------------------------------
 // MurmurHashNeutral2, by Austin Appleby

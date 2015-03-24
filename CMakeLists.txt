@@ -18,8 +18,8 @@ add_library(
   lookup3.cpp
   md5.cpp
   MurmurHash1.cpp
-  MurmurHash2.cpp
-  MurmurHash3.cpp
+  MurmurHash2.c
+  MurmurHash3.c
   Platform.cpp
   Random.cpp
   sha1.cpp
@@ -31,6 +31,8 @@ add_library(
   Types.cpp
   PMurHash.c
 )
+
+set(CMAKE_C_FLAGS "-std=c99 -Wall -Wextra -Werror")
 
 add_executable(
   SMHasher
